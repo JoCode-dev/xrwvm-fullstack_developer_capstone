@@ -1,12 +1,7 @@
 # Uncomment the required imports before adding the code
 
-from django.shortcuts import render
-from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import logout
-from django.contrib import messages
-from datetime import datetime
 
 from django.http import JsonResponse
 from django.contrib.auth import login, authenticate
@@ -31,7 +26,9 @@ def get_cars(request):
     car_models = CarModel.objects.select_related('car_make')
     cars = []
     for car_model in car_models:
-        cars.append({"CarModel": car_model.name, "CarMake": car_model.car_make.name})
+        cars.append({
+            "CarModel": car_model.name,
+            "CarMake": car_model.car_make.name})
     return JsonResponse({"CarModels": cars})
 
 
@@ -76,22 +73,24 @@ def registration(request):
         # Check if user already exists
         User.objects.get(username=username)
         username_exist = True
-    except:
-        # If not, simply log this is a new user
-        logger.debug("{} is new user".format(username))
+    except Exception as e:
+        print(f"Error: {e}")
 
-    # If it is a new user
-    if not username_exist:
-        # Create user in auth_user table
-        user = User.objects.create_user(username=username, first_name=first_name, last_name=last_name,
-                                        password=password, email=email)
-        # Login the user and redirect to list page
-        login(request, user)
-        data = {"userName": username, "status": "Authenticated"}
-        return JsonResponse(data)
-    else:
-        data = {"userName": username, "error": "Already Registered"}
-        return JsonResponse(data)
+
+# If it is a new user
+if not username_exist:
+    # Create user in auth_user table
+    user = User.objects.create_user(
+        username=username,
+        first_name=first_name, last_name=last_name,
+        password=password, email=email)
+    # Login the user and redirect to list page
+    login(request, user)
+    data = {"userName": username, "status": "Authenticated"}
+    return JsonResponse(data)
+else:
+    data = {"userName": username, "error": "Already Registered"}
+    return JsonResponse(data)
 
 
 # # Update the `get_dealerships` view to render the index page with
