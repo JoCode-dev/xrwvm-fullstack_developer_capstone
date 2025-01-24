@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .populate import initiate
 from .models import CarMake, CarModel
 
-from .restapis import get_request, post_review
+from .restapis import get_request
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -59,8 +59,6 @@ def logout_request(request):
 # Create a `registration` view to handle sign up request
 @csrf_exempt
 def registration(request):
-    context = {}
-
     data = json.loads(request.body)
     username = data['userName']
     password = data['password']
@@ -68,7 +66,6 @@ def registration(request):
     last_name = data['lastName']
     email = data['email']
     username_exist = False
-    email_exist = False
     try:
         # Check if user already exists
         User.objects.get(username=username)
@@ -142,8 +139,8 @@ def get_dealer_details(request, dealer_id):
 # def add_review(request):
 # ...
 def add_review(request):
-    if (request.user.is_anonymous == False):
-        data = json.loads(request.body)
+    if (request.user.is_anonymous is False):
+        # data = json.loads(request.body)
         try:
             # response = post_review(data)
             return JsonResponse({"status": 200})
